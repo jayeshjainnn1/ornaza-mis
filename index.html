@@ -325,7 +325,7 @@ label.lbl{font-size:.82rem;font-weight:600;color:var(--muted);display:block;marg
 //  CONFIG — paste GAS Web App URL below
 // ═══════════════════════════════════════════
 const CONFIG = {
-  API_URL: '', // https://script.google.com/macros/s/XXXXX/exec
+  API_URL: 'https://script.google.com/macros/s/AKfycbzDFahLVFmagLApJQuWDPzAewZqGY4gi2bHu1uCg62MXnX0DAs3umpZEfOTb5k1ZNJ7PA/exec',
 };
 
 // ═══════════════════════════════════════════
@@ -411,22 +411,34 @@ function mockApi(action, body) {
       attendanceToday:8, totalEmployees:12,
     }),
     getPickup: () => ({rows:[
-      {date:'21-Jun-26',awb:'DEL001',product:'Gold Ring',city:'Delhi',status:'Picked'},
-      {date:'21-Jun-26',awb:'DEL002',product:'Necklace Set',city:'Mumbai',status:'Pending'},
-      {date:'21-Jun-26',awb:'DEL003',product:'Bracelet',city:'Bangalore',status:'Picked'},
+      {date:'2026-06-21',courier:'DELHIVERY',awb:'DEL001234',type:'pickup',packedBy:'SONU'},
+      {date:'2026-06-21',courier:'AMAZON',   awb:'AMZ987654',type:'pickup',packedBy:'SONU'},
+      {date:'2026-06-21',courier:'BLUEDART', awb:'BD556677', type:'pickup',packedBy:'MITALI'},
+      {date:'2026-06-21',courier:'FLIPKART', awb:'FK112233', type:'pickup',packedBy:'MITALI'},
+      {date:'2026-06-21',courier:'CANCEL',   awb:'CX001',    type:'cancel', packedBy:'SONU'},
+      {date:'2026-06-20',courier:'DELHIVERY',awb:'DEL001100',type:'pickup',packedBy:'SONU'},
+      {date:'2026-06-20',courier:'EKART',    awb:'EK223344', type:'pickup',packedBy:'MITALI'},
     ]}),
     getReturn: () => ({rows:[
-      {date:'20-Jun-26',awb:'RET001',product:'Bracelet',reason:'Size issue',status:'Returned'},
-      {date:'19-Jun-26',awb:'RET002',product:'Ring',reason:'Damaged',status:'RTO'},
+      {date:'2026-06-21',courier:'DELHIVERY',awb:'DEL000899',remark:'Customer Refused'},
+      {date:'2026-06-21',courier:'AMAZON',   awb:'AMZ876543',remark:'Damaged'},
+      {date:'2026-06-20',courier:'BLUEDART', awb:'BD445566', remark:'Wrong Address'},
     ]}),
-    getReconcile: () => ({totalPickup:42, totalReturn:5, netPickup:37, returnRate:'11.9%', sonuPacked:28, mitaliPacked:14}),
+    getReconcile: () => ({
+      summary:{totalPickup:4331,totalReturn:660,net:3671,returnRate:15.24,sonuTotal:2179,mitaliTotal:1853},
+      rows:[
+        {date:'2026-06-01',day:'Mon',bdPickup:45,amzPickup:112,delPickup:89,fkPickup:67,xpressPickup:8,ekartPickup:23,mynPickup:15,marutiPickup:4,otherPickup:2,cancel:3,damage:1,totalPickup:365,bdReturn:6,amzReturn:18,delReturn:12,fkReturn:8,xpressReturn:1,ekartReturn:3,mynReturn:2,marutiReturn:0,otherReturn:0,totalReturn:50,net:315,returnRate:13.70,sonuPacked:190,mitaliPacked:175},
+        {date:'2026-06-02',day:'Tue',bdPickup:41,amzPickup:105,delPickup:83,fkPickup:61,xpressPickup:7,ekartPickup:21,mynPickup:13,marutiPickup:3,otherPickup:2,cancel:2,damage:0,totalPickup:338,bdReturn:5,amzReturn:16,delReturn:11,fkReturn:7,xpressReturn:1,ekartReturn:2,mynReturn:1,marutiReturn:0,otherReturn:0,totalReturn:43,net:295,returnRate:12.72,sonuPacked:178,mitaliPacked:160},
+        {date:'2026-06-21',day:'Sun',bdPickup:52,amzPickup:130,delPickup:95,fkPickup:74,xpressPickup:9,ekartPickup:27,mynPickup:18,marutiPickup:5,otherPickup:3,cancel:4,damage:2,totalPickup:419,bdReturn:7,amzReturn:21,delReturn:14,fkReturn:9,xpressReturn:1,ekartReturn:4,mynReturn:2,marutiReturn:0,otherReturn:0,totalReturn:58,net:361,returnRate:13.84,sonuPacked:215,mitaliPacked:204},
+      ]
+    }),
     getKeepMyOrder: () => ({rows:[
-      {id:'KO001',customer:'Priya S.',product:'Gold Ring',date:'19-Jun-26',status:'Open'},
-      {id:'KO002',customer:'Meera K.',product:'Necklace',date:'18-Jun-26',status:'Open'},
+      {'Order ID':'OZ10234','Customer':'Priya S.','Date':'2026-06-19','Remark':'Hold for 3 days'},
+      {'Order ID':'OZ10235','Customer':'Meera K.','Date':'2026-06-18','Remark':'Exchange request'},
     ]}),
     getPickupStaff: () => ({rows:[
-      {name:'Sonu Kumar',role:'Packing',pickups:28,date:'21-Jun-26'},
-      {name:'Mitali Sharma',role:'Packing',pickups:14,date:'21-Jun-26'},
+      {'Name':'SONU'},
+      {'Name':'MITALI'},
     ]}),
     getOrders: () => ({rows:[
       {id:'#ORN1234',customer:'Anita K.',product:'Gold Ring',amount:2499,status:'Delivered',date:'21-Jun-26'},
@@ -689,37 +701,115 @@ async function loadPickupTab(i) {
   tc.innerHTML = '<div class="loading"><i class="ti ti-loader"></i></div>';
   try {
     if (i===0) {
+      // PICKUP — linked sheet: date, courier, awb, type, packedBy
       const d = await api('getPickup');
-      tc.innerHTML = `<div class="flex justify-between mb-2"><div class="chip"><i class="ti ti-package"></i> ${d.rows.length} entries</div><button class="btn btn-primary btn-sm" onclick="openAddPickup()"><i class="ti ti-plus"></i> Add Entry</button></div>
-      <div class="table-wrap"><table><thead><tr><th>Date</th><th>AWB</th><th>Product</th><th>City</th><th>Status</th></tr></thead>
-      <tbody>${d.rows.map(r=>`<tr><td>${r.date}</td><td>${r.awb}</td><td>${r.product}</td><td>${r.city}</td><td>${badge(r.status)}</td></tr>`).join('')||noRows(5)}</tbody></table></div>`;
-    } else if (i===1) {
-      const d = await api('getReturn');
-      tc.innerHTML = `<div class="flex justify-between mb-2"><div class="chip"><i class="ti ti-arrow-back-up"></i> ${d.rows.length} returns</div><button class="btn btn-primary btn-sm" onclick="openAddReturn()"><i class="ti ti-plus"></i> Add Return</button></div>
-      <div class="table-wrap"><table><thead><tr><th>Date</th><th>AWB</th><th>Product</th><th>Reason</th><th>Status</th></tr></thead>
-      <tbody>${d.rows.map(r=>`<tr><td>${r.date}</td><td>${r.awb}</td><td>${r.product}</td><td>${r.reason}</td><td>${badge(r.status)}</td></tr>`).join('')||noRows(5)}</tbody></table></div>`;
-    } else if (i===2) {
-      const d = await api('getReconcile');
+      const pickupRows = (d.rows||[]).filter(r=>r.type==='pickup');
+      const cancelRows = (d.rows||[]).filter(r=>r.type==='cancel'||r.type==='damage');
+      const courierCounts = {};
+      pickupRows.forEach(r=>{ courierCounts[r.courier]=(courierCounts[r.courier]||0)+1; });
+      const courierBadges = Object.entries(courierCounts).map(([c,n])=>`<span class="chip" style="font-size:.7rem;padding:2px 8px">${c}: ${n}</span>`).join('');
       tc.innerHTML = `
-      <div class="grid g3 mb-2">
-        <div class="card stat-card"><div class="stat-icon" style="background:rgba(212,132,154,.12);color:var(--rose)"><i class="ti ti-package"></i></div><div><div class="stat-val">${d.totalPickup}</div><div class="stat-label">Total Pickup</div></div></div>
-        <div class="card stat-card"><div class="stat-icon" style="background:rgba(231,76,60,.1);color:#e74c3c"><i class="ti ti-arrow-back-up"></i></div><div><div class="stat-val">${d.totalReturn}</div><div class="stat-label">Total Return</div></div></div>
-        <div class="card stat-card"><div class="stat-icon" style="background:rgba(39,174,96,.12);color:#27ae60"><i class="ti ti-check"></i></div><div><div class="stat-val">${d.netPickup}</div><div class="stat-label">Net Pickup</div></div></div>
+      <div class="flex gap-2 mb-2 items-center flex-wrap">
+        <div class="chip"><i class="ti ti-package"></i> ${pickupRows.length} pickups</div>
+        ${cancelRows.length?`<div class="chip" style="background:rgba(231,76,60,.1);color:#e74c3c"><i class="ti ti-x"></i> ${cancelRows.length} cancel/damage</div>`:''}
       </div>
-      <div class="grid g2">
-        <div class="card"><div class="card-title mb-1">Return Rate</div><div style="font-size:2.5rem;font-weight:700;color:var(--rose-deep)">${d.returnRate}</div></div>
-        <div class="card"><div class="card-title mb-2">Packed Today</div><div class="flex gap-2"><div class="chip">Sonu: ${d.sonuPacked}</div><div class="chip">Mitali: ${d.mitaliPacked}</div></div></div>
-      </div>`;
+      <div class="flex gap-1 mb-2 flex-wrap">${courierBadges}</div>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>Courier</th><th>AWB</th><th>Type</th><th>Packed By</th></tr></thead>
+      <tbody>${(d.rows||[]).map(r=>`<tr><td>${r.date}</td><td><b>${r.courier}</b></td><td style="font-family:monospace;font-size:.8rem">${r.awb}</td><td>${r.type==='pickup'?'<span style="color:#27ae60">Pickup</span>':r.type==='cancel'?'<span style="color:#e74c3c">Cancel</span>':'<span style="color:#f39c12">Damage</span>'}</td><td>${r.packedBy||'—'}</td></tr>`).join('')||noRows(5)}</tbody></table></div>`;
+    } else if (i===1) {
+      // RETURN — linked sheet: date, courier, awb, remark
+      const d = await api('getReturn');
+      const retCounts = {};
+      (d.rows||[]).forEach(r=>{ retCounts[r.courier]=(retCounts[r.courier]||0)+1; });
+      const retBadges = Object.entries(retCounts).map(([c,n])=>`<span class="chip" style="font-size:.7rem;padding:2px 8px">${c}: ${n}</span>`).join('');
+      tc.innerHTML = `
+      <div class="flex gap-2 mb-2 items-center"><div class="chip"><i class="ti ti-arrow-back-up"></i> ${(d.rows||[]).length} returns</div></div>
+      <div class="flex gap-1 mb-2 flex-wrap">${retBadges}</div>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>Courier</th><th>AWB</th><th>Remark</th></tr></thead>
+      <tbody>${(d.rows||[]).map(r=>`<tr><td>${r.date}</td><td><b>${r.courier}</b></td><td style="font-family:monospace;font-size:.8rem">${r.awb}</td><td>${r.remark||'—'}</td></tr>`).join('')||noRows(4)}</tbody></table></div>`;
+    } else if (i===2) {
+      // RECONCILE — linked sheet: pre-calculated daily totals
+      const d = await api('getReconcile');
+      const s = d.summary || {};
+      const rows = d.rows || [];
+      const rateColor = (r) => r > 20 ? '#e74c3c' : r > 10 ? '#f39c12' : '#27ae60';
+      tc.innerHTML = `
+      <!-- Summary Cards -->
+      <div class="grid g3 mb-2">
+        <div class="card stat-card">
+          <div class="stat-icon" style="background:rgba(212,132,154,.12);color:var(--rose)"><i class="ti ti-package"></i></div>
+          <div><div class="stat-val">${s.totalPickup||0}</div><div class="stat-label">Total Pickups</div></div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon" style="background:rgba(231,76,60,.1);color:#e74c3c"><i class="ti ti-arrow-back-up"></i></div>
+          <div><div class="stat-val">${s.totalReturn||0}</div><div class="stat-label">Total Returns</div></div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-icon" style="background:rgba(39,174,96,.12);color:#27ae60"><i class="ti ti-trending-up"></i></div>
+          <div><div class="stat-val">${s.net||0}</div><div class="stat-label">Net (P−R)</div></div>
+        </div>
+      </div>
+      <div class="grid g3 mb-3">
+        <div class="card" style="text-align:center">
+          <div class="stat-label mb-1">Return Rate</div>
+          <div style="font-size:2.2rem;font-weight:800;color:${rateColor(s.returnRate||0)}">${s.returnRate||0}%</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div class="stat-label mb-1">Sonu Packed</div>
+          <div style="font-size:2rem;font-weight:700;color:var(--rose)">${s.sonuTotal||0}</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div class="stat-label mb-1">Mitali Packed</div>
+          <div style="font-size:2rem;font-weight:700;color:var(--rose-deep)">${s.mitaliTotal||0}</div>
+        </div>
+      </div>
+      <!-- Daily Table -->
+      <div class="card mb-1" style="padding:.5rem .8rem"><b>Daily Breakdown</b> <span style="color:var(--text-muted);font-size:.8rem">(${rows.length} days)</span></div>
+      <div class="table-wrap"><table style="font-size:.78rem">
+        <thead><tr>
+          <th>Date</th><th>Day</th>
+          <th style="color:var(--rose)">↑ Pickup</th>
+          <th style="color:#e74c3c">↓ Return</th>
+          <th>NET</th>
+          <th>Ret%</th>
+          <th>BD</th><th>AMZ</th><th>DEL</th><th>FK</th><th>EKART</th><th>MYN</th>
+          <th>Cancel</th><th>Damage</th>
+          <th style="color:var(--rose)">Sonu</th>
+          <th style="color:var(--rose-deep)">Mitali</th>
+        </tr></thead>
+        <tbody>${rows.map(r=>{
+          const rc = r.returnRate > 20 ? '#e74c3c' : r.returnRate > 10 ? '#f39c12' : '#27ae60';
+          return `<tr>
+            <td><b>${r.date}</b></td><td>${r.day}</td>
+            <td style="font-weight:700;color:var(--rose)">${r.totalPickup}</td>
+            <td style="color:#e74c3c">${r.totalReturn}</td>
+            <td style="font-weight:600">${r.net}</td>
+            <td style="color:${rc};font-weight:600">${r.returnRate}%</td>
+            <td>${r.bdPickup||0}</td><td>${r.amzPickup||0}</td><td>${r.delPickup||0}</td>
+            <td>${r.fkPickup||0}</td><td>${r.ekartPickup||0}</td><td>${r.mynPickup||0}</td>
+            <td style="color:#e74c3c">${r.cancel||0}</td>
+            <td style="color:#f39c12">${r.damage||0}</td>
+            <td style="color:var(--rose)">${r.sonuPacked||0}</td>
+            <td style="color:var(--rose-deep)">${r.mitaliPacked||0}</td>
+          </tr>`;
+        }).join('')||noRows(16)}</tbody>
+      </table></div>`;
     } else if (i===3) {
+      // Keep My Order — linked sheet returns generic key-value rows
       const d = await api('getKeepMyOrder');
-      tc.innerHTML = `<div class="flex justify-between mb-2"><div class="chip">${d.rows.length} open requests</div><button class="btn btn-primary btn-sm" onclick="openKeepOrder()"><i class="ti ti-plus"></i> New Request</button></div>
-      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Customer</th><th>Product</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
-      <tbody>${d.rows.map(r=>`<tr><td>${r.id}</td><td>${r.customer}</td><td>${r.product}</td><td>${r.date}</td><td>${badge(r.status)}</td><td><button class="btn btn-sm btn-success" onclick="resolveKeepOrder('${r.id}')">Resolve</button></td></tr>`).join('')||noRows(6)}</tbody></table></div>`;
+      const rows = d.rows || [];
+      const headers = rows.length ? Object.keys(rows[0]) : [];
+      tc.innerHTML = `<div class="flex justify-between mb-2"><div class="chip">${rows.length} orders on hold</div></div>
+      <div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r=>`<tr>${headers.map(h=>`<td>${r[h]||'—'}</td>`).join('')}</tr>`).join('')||noRows(headers.length||3)}</tbody></table></div>`;
     } else if (i===4) {
+      // STAFF — linked sheet returns generic key-value rows (SONU, MITALI etc.)
       const d = await api('getPickupStaff');
-      tc.innerHTML = `<div class="flex justify-between mb-2"><div class="chip">${d.rows.length} staff</div><button class="btn btn-primary btn-sm" onclick="openAddStaff()"><i class="ti ti-plus"></i> Log Staff</button></div>
-      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Pickups</th><th>Date</th></tr></thead>
-      <tbody>${d.rows.map(r=>`<tr><td>${r.name}</td><td>${r.role}</td><td>${r.pickups}</td><td>${r.date}</td></tr>`).join('')||noRows(4)}</tbody></table></div>`;
+      const rows = d.rows || [];
+      const headers = rows.length ? Object.keys(rows[0]) : [];
+      tc.innerHTML = `<div class="chip mb-2">${rows.length} staff records</div>
+      <div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r=>`<tr>${headers.map(h=>`<td>${r[h]||'—'}</td>`).join('')}</tr>`).join('')||noRows(headers.length||2)}</tbody></table></div>`;
     }
   } catch(e) { tc.innerHTML = `<div class="empty-state"><i class="ti ti-alert-triangle"></i><br/>${e.message}</div>`; }
 }
