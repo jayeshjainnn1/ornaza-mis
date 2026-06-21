@@ -1,0 +1,27 @@
+{
+  "name": "Ornaza MIS",
+  "short_name": "Ornaza",
+  "description": "Ornaza Jewelry Management Information System",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#D4849A",
+  "background_color": "#FDF0F3",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192/D4849A/ffffff?text=O",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://via.placeholder.com/512/D4849A/ffffff?text=O",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "en-IN"
+}

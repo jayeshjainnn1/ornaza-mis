@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<meta name="theme-color" content="#D4849A"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<title>Ornaza MIS</title>
+<link rel="manifest" href="./manifest.json"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --rose:#D4849A;--rose-deep:#8B3A54;--copper:#C9896A;
+  --dark:#1A0D14;--bg:#FDF0F3;--card:#fff;
+  --text:#1A0D14;--muted:#7a5563;--border:#f0d5dc;
+  --sidebar:220px;--header:56px;
+  --shadow:0 2px 12px rgba(212,132,154,.15);
+}
+[data-dark="1"]{
+  --bg:#1A0D14;--card:#2a1520;--text:#fdf0f3;
+  --muted:#c9a0ad;--border:#3d1f2b;
+  --shadow:0 2px 12px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--dark) 0%,var(--rose-deep) 100%)}
+.login-box{background:#fff;border-radius:20px;padding:40px 36px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo h1{font-size:1.6rem;font-weight:700;color:var(--rose-deep);margin-top:10px}
+.login-logo p{font-size:.82rem;color:#7a5563;margin-top:2px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.82rem;font-weight:600;color:#7a5563;margin-bottom:6px}
+.form-group input{width:100%;padding:11px 14px;border:1.5px solid #f0d5dc;border-radius:10px;font-size:.95rem;outline:none;transition:border .2s}
+.form-group input:focus{border-color:var(--rose)}
+.btn-login{width:100%;padding:13px;background:linear-gradient(135deg,var(--rose) 0%,var(--rose-deep) 100%);color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:600;transition:opacity .2s}
+.btn-login:hover{opacity:.9}
+.login-err{color:#e74c3c;font-size:.82rem;margin-top:10px;text-align:center;display:none}
+
+/* LAYOUT */
+#app{display:none;min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar);background:var(--dark);overflow-y:auto;z-index:100;transition:transform .3s}
+.sidebar-logo{padding:18px 16px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar-logo h2{color:#fff;font-size:1.1rem;font-weight:700}
+.sidebar-logo p{color:rgba(255,255,255,.45);font-size:.75rem}
+.nav-section{padding:10px 0}
+.nav-label{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;padding:8px 18px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;color:rgba(255,255,255,.65);font-size:.88rem;cursor:pointer;transition:background .15s,color .15s}
+.nav-item i{font-size:1.1rem;flex-shrink:0}
+.nav-item:hover,.nav-item.active{background:rgba(212,132,154,.18);color:#fff}
+.nav-item.active{border-right:3px solid var(--rose)}
+.main{margin-left:var(--sidebar);min-height:100vh}
+.topbar{height:var(--header);background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 20px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+.topbar-title{font-size:1.05rem;font-weight:600;flex:1}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.icon-btn{width:36px;height:36px;border:none;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.1rem;transition:background .15s}
+.icon-btn:hover{background:var(--border)}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;cursor:pointer}
+.page-content{padding:20px}
+.hamburger{display:none;border:none;background:none;font-size:1.4rem;color:var(--muted);cursor:pointer;align-items:center}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+
+/* CARDS */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border-radius:14px;padding:20px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:.95rem;font-weight:600}
+.stat-card{display:flex;align-items:center;gap:14px}
+.stat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.stat-val{font-size:1.5rem;font-weight:700}
+.stat-label{font-size:.78rem;color:var(--muted);margin-top:1px}
+
+/* TABLES */
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.87rem}
+th{background:var(--bg);color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;padding:10px 14px;text-align:left;white-space:nowrap}
+td{padding:11px 14px;border-top:1px solid var(--border);color:var(--text)}
+tr:hover td{background:rgba(212,132,154,.04)}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.badge-green{background:#e8f5e9;color:#2e7d32}
+.badge-red{background:#fce4e4;color:#c62828}
+.badge-yellow{background:#fff8e1;color:#f57f17}
+.badge-blue{background:#e3f2fd;color:#1565c0}
+.badge-rose{background:#fce4ec;color:#880e4f}
+.badge-gray{background:#f5f5f5;color:#616161}
+
+/* TABS */
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.tab{padding:9px 18px;font-size:.88rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .15s,border-color .15s}
+.tab.active{color:var(--rose-deep);border-bottom-color:var(--rose)}
+
+/* FORMS */
+.form-row{display:grid;gap:12px}
+.fr2{grid-template-columns:repeat(2,1fr)}
+.fr3{grid-template-columns:repeat(3,1fr)}
+label.lbl{font-size:.82rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px}
+.inp{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:.9rem;outline:none;transition:border .2s}
+.inp:focus{border-color:var(--rose)}
+.btn{padding:10px 20px;border:none;border-radius:10px;font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn:hover{opacity:.88}
+.btn-primary{background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff}
+.btn-secondary{background:var(--bg);color:var(--text);border:1.5px solid var(--border)}
+.btn-sm{padding:7px 14px;font-size:.82rem;border-radius:8px}
+.btn-danger{background:#fce4e4;color:#c62828;border:none}
+.btn-success{background:#e8f5e9;color:#2e7d32;border:none}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:var(--card);border-radius:16px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal h3{font-size:1.05rem;font-weight:700;margin-bottom:18px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.camera-preview{width:100%;border-radius:10px;background:#000;display:block;max-height:240px;object-fit:cover}
+
+/* SEARCH */
+.search-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:flex-start;justify-content:center;padding-top:80px}
+.search-overlay.open{display:flex}
+.search-box{background:var(--card);border-radius:14px;width:100%;max-width:540px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.search-input-wrap{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.search-input-wrap i{font-size:1.2rem;color:var(--muted)}
+.search-input-wrap input{flex:1;border:none;background:transparent;font-size:1rem;color:var(--text);outline:none}
+.search-results{max-height:320px;overflow-y:auto}
+.search-result-item{display:flex;align-items:center;gap:12px;padding:12px 18px;cursor:pointer;transition:background .15s}
+.search-result-item:hover{background:var(--bg)}
+.search-result-item i{color:var(--rose)}
+
+/* OFFLINE BANNER */
+.offline-banner{background:#f39c12;color:#fff;text-align:center;padding:6px;font-size:.82rem;font-weight:600;display:none}
+.offline-banner.show{display:block}
+
+/* ATTENDANCE */
+.attend-clock{text-align:center;padding:30px 20px}
+.clock-time{font-size:3rem;font-weight:700;color:var(--rose-deep);font-variant-numeric:tabular-nums}
+.clock-date{font-size:.9rem;color:var(--muted);margin-top:4px}
+.gps-indicator{display:flex;align-items:center;gap:8px;font-size:.88rem;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--border);margin:16px 0}
+.gps-dot{width:10px;height:10px;border-radius:50%;background:#ccc;flex-shrink:0}
+.gps-dot.ok{background:#27ae60;animation:pulse 1.5s infinite}
+.gps-dot.err{background:#e74c3c}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.attend-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+
+/* CALENDAR */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-day-head{text-align:center;font-size:.72rem;font-weight:600;color:var(--muted);padding:6px 0}
+.cal-day{min-height:70px;padding:6px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:background .15s}
+.cal-day:hover{background:var(--bg)}
+.cal-day.today{border-color:var(--rose);background:rgba(212,132,154,.08)}
+.cal-day.other-month{opacity:.35}
+.cal-day-num{font-size:.82rem;font-weight:600;margin-bottom:3px}
+.cal-event-dot{font-size:.72rem;color:var(--rose);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .main{margin-left:0}
+  .hamburger{display:flex}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .fr2,.fr3{grid-template-columns:1fr}
+  .page-content{padding:14px}
+  .tabs{gap:0}
+  .tab{padding:8px 12px;font-size:.82rem}
+}
+
+/* UTILITIES */
+.mt-1{margin-top:8px}.mt-2{margin-top:16px}.mt-3{margin-top:24px}
+.mb-1{margin-bottom:8px}.mb-2{margin-bottom:16px}
+.flex{display:flex}.items-center{align-items:center}.gap-2{gap:8px}.gap-3{gap:12px}
+.justify-between{justify-content:space-between}
+.text-muted{color:var(--muted)}.text-sm{font-size:.82rem}
+.font-bold{font-weight:700}.w-full{width:100%}
+.hidden{display:none!important}
+.loading{text-align:center;padding:40px;color:var(--muted)}
+.loading i{font-size:2rem;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-state i{font-size:3rem;opacity:.3;display:block;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:600;background:rgba(212,132,154,.12);color:var(--rose-deep)}
+.section-title{font-size:1.05rem;font-weight:700;margin-bottom:16px}
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--rose),var(--rose-deep));transition:width .4s}
+</style>
+</head>
+<body>
+
+<div class="offline-banner" id="offlineBanner">&#9888; Offline mode — changes will sync when connected</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#D4849A,#8B3A54);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:1.8rem">&#128141;</div>
+      <h1>Ornaza MIS</h1>
+      <p>Management Information System</p>
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="kavish or jayesh" autocomplete="username"/>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="current-password"/>
+    </div>
+    <button class="btn-login" id="loginBtn">Sign In</button>
+    <div class="login-err" id="loginErr">Invalid credentials. Please try again.</div>
+    <p style="text-align:center;font-size:.75rem;color:#999;margin-top:20px">Ornaza Jewelry &#169; 2026</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <h2>&#128141; Ornaza MIS</h2>
+      <p id="sidebarUser">Welcome</p>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" data-page="dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="nav-item" data-page="pickup"><i class="ti ti-package"></i> Pickup / Cancel</div>
+      <div class="nav-item" data-page="orders"><i class="ti ti-shopping-cart"></i> Orders</div>
+      <div class="nav-item" data-page="ndr"><i class="ti ti-alert-triangle"></i> NDR / Returns</div>
+      <div class="nav-item" data-page="rto"><i class="ti ti-chart-bar"></i> RTO Analytics</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">HR</div>
+      <div class="nav-item" data-page="attendance"><i class="ti ti-clock"></i> Attendance</div>
+      <div class="nav-item" data-page="employees"><i class="ti ti-users"></i> Employees</div>
+      <div class="nav-item" data-page="leave"><i class="ti ti-calendar-off"></i> Leave</div>
+      <div class="nav-item" data-page="payroll"><i class="ti ti-cash"></i> Payroll</div>
+      <div class="nav-item" data-page="training"><i class="ti ti-school"></i> Training</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Finance</div>
+      <div class="nav-item" data-page="expenses"><i class="ti ti-receipt"></i> Expenses</div>
+      <div class="nav-item" data-page="bank"><i class="ti ti-building-bank"></i> Bank Statements</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Catalog</div>
+      <div class="nav-item" data-page="products"><i class="ti ti-diamond"></i> Products</div>
+      <div class="nav-item" data-page="categories"><i class="ti ti-tags"></i> Categories</div>
+      <div class="nav-item" data-page="shopify"><i class="ti ti-refresh"></i> Shopify Sync</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Growth</div>
+      <div class="nav-item" data-page="influencers"><i class="ti ti-star"></i> Influencers</div>
+      <div class="nav-item" data-page="tasks"><i class="ti ti-checklist"></i> Tasks</div>
+      <div class="nav-item" data-page="calendar"><i class="ti ti-calendar"></i> Calendar</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">System</div>
+      <div class="nav-item" data-page="settings"><i class="ti ti-settings"></i> Settings</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger" id="hamburgerBtn"><i class="ti ti-menu-2"></i></button>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="searchBtn" title="Search Ctrl+K"><i class="ti ti-search"></i></button>
+        <button class="icon-btn" id="darkBtn" title="Dark mode"><i class="ti ti-moon"></i></button>
+        <button class="icon-btn" id="syncBtn" title="Sync now"><i class="ti ti-refresh"></i></button>
+        <div class="avatar" id="userAvatar">J</div>
+      </div>
+    </div>
+    <div class="page-content" id="pageContent"></div>
+  </div>
+</div>
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-box">
+    <div class="search-input-wrap">
+      <i class="ti ti-search"></i>
+      <input type="text" id="searchInput" placeholder="Search modules, actions&#8230;"/>
+      <span class="text-muted text-sm">ESC</span>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<!-- CAMERA MODAL -->
+<div class="modal-bg" id="cameraModal">
+  <div class="modal">
+    <h3>&#128248; Attendance Verification</h3>
+    <p class="text-sm text-muted mb-1">Step <span id="camStep">1</span> of 2 — <span id="camStepLabel">Take selfie</span></p>
+    <video id="camVideo" class="camera-preview" autoplay playsinline muted></video>
+    <canvas id="camCanvas" class="hidden"></canvas>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="camCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="camCaptureBtn"><i class="ti ti-camera"></i> Capture</button>
+    </div>
+  </div>
+</div>
+
+<!-- GENERIC MODAL -->
+<div class="modal-bg" id="genericModal">
+  <div class="modal">
+    <h3 id="genericModalTitle">Modal</h3>
+    <div id="genericModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="genericModalClose">Close</button>
+      <button class="btn btn-primary hidden" id="genericModalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONFIG — paste GAS Web App URL below
+// ═══════════════════════════════════════════
+const CONFIG = {
+  API_URL: '', // https://script.google.com/macros/s/XXXXX/exec
+};
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+const S = {
+  token: null, user: null, role: null,
+  page: 'dashboard', dark: false,
+  pickupTab: 0,
+  calYear: new Date().getFullYear(),
+  calMonth: new Date().getMonth(),
+};
+
+// ═══════════════════════════════════════════
+//  INDEXEDDB — offline queue + cache
+// ═══════════════════════════════════════════
+let db;
+function initIDB() {
+  return new Promise(res => {
+    const req = indexedDB.open('ornaza_mis', 1);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('queue')) d.createObjectStore('queue', {keyPath:'id', autoIncrement:true});
+      if (!d.objectStoreNames.contains('cache')) d.createObjectStore('cache', {keyPath:'key'});
+    };
+    req.onsuccess = e => { db = e.target.result; res(); };
+    req.onerror = () => res();
+  });
+}
+const idbPut = (store, val) => new Promise(res => { const t = db.transaction(store,'readwrite'); t.objectStore(store).put(val); t.oncomplete = () => res(); });
+const idbGet = (store, key) => new Promise(res => { const t = db.transaction(store,'readonly'); const r = t.objectStore(store).get(key); r.onsuccess = () => res(r.result); });
+const idbGetAll = store => new Promise(res => { const t = db.transaction(store,'readonly'); const r = t.objectStore(store).getAll(); r.onsuccess = () => res(r.result||[]); });
+const idbDelete = (store, key) => new Promise(res => { const t = db.transaction(store,'readwrite'); t.objectStore(store).delete(key); t.oncomplete = () => res(); });
+
+async function queueOrSend(action, body) {
+  if (!navigator.onLine) {
+    await idbPut('queue', {action, body, ts: Date.now()});
+    toast('Saved offline — syncs when connected', 'warning');
+    return null;
+  }
+  return api(action, body);
+}
+
+async function flushQueue() {
+  const items = await idbGetAll('queue');
+  for (const item of items) {
+    try { await api(item.action, item.body); await idbDelete('queue', item.id); } catch {}
+  }
+}
+
+// ═══════════════════════════════════════════
+//  API
+// ═══════════════════════════════════════════
+async function api(action, body = {}) {
+  if (!CONFIG.API_URL) return mockApi(action, body);
+  const res = await fetch(CONFIG.API_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({action, token: S.token, ...body})
+  });
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return json;
+}
+
+// ─── MOCK (demo mode when API_URL is empty) ───
+function mockApi(action, body) {
+  const delay = ms => new Promise(r => setTimeout(r, ms || 250));
+  const mocks = {
+    ping: () => ({status:'ok'}),
+    login: () => {
+      const creds = {kavish:'ornaza2026', jayesh:'ornaza2026', staff:'staff123'};
+      if (creds[body.username] === body.password)
+        return {token:'demo-token', name: body.username==='kavish'?'Kavish Jain':body.username==='jayesh'?'Jayesh Jain':'Staff User', role: body.username==='staff'?'staff':'founder'};
+      throw new Error('Invalid username or password');
+    },
+    getDashboard: () => ({
+      todayOrders:42, totalRevenue:128500, pendingNDR:7, rtoPct:12.4,
+      recentOrders:[
+        {id:'#ORN1234',product:'Gold Plated Ring',amount:2499,status:'Delivered'},
+        {id:'#ORN1235',product:'Pearl Necklace',amount:1899,status:'Shipped'},
+        {id:'#ORN1236',product:'Silver Earrings',amount:999,status:'Pending'},
+      ],
+      attendanceToday:8, totalEmployees:12,
+    }),
+    getPickup: () => ({rows:[
+      {date:'21-Jun-26',awb:'DEL001',product:'Gold Ring',city:'Delhi',status:'Picked'},
+      {date:'21-Jun-26',awb:'DEL002',product:'Necklace Set',city:'Mumbai',status:'Pending'},
+      {date:'21-Jun-26',awb:'DEL003',product:'Bracelet',city:'Bangalore',status:'Picked'},
+    ]}),
+    getReturn: () => ({rows:[
+      {date:'20-Jun-26',awb:'RET001',product:'Bracelet',reason:'Size issue',status:'Returned'},
+      {date:'19-Jun-26',awb:'RET002',product:'Ring',reason:'Damaged',status:'RTO'},
+    ]}),
+    getReconcile: () => ({totalPickup:42, totalReturn:5, netPickup:37, returnRate:'11.9%', sonuPacked:28, mitaliPacked:14}),
+    getKeepMyOrder: () => ({rows:[
+      {id:'KO001',customer:'Priya S.',product:'Gold Ring',date:'19-Jun-26',status:'Open'},
+      {id:'KO002',customer:'Meera K.',product:'Necklace',date:'18-Jun-26',status:'Open'},
+    ]}),
+    getPickupStaff: () => ({rows:[
+      {name:'Sonu Kumar',role:'Packing',pickups:28,date:'21-Jun-26'},
+      {name:'Mitali Sharma',role:'Packing',pickups:14,date:'21-Jun-26'},
+    ]}),
+    getOrders: () => ({rows:[
+      {id:'#ORN1234',customer:'Anita K.',product:'Gold Ring',amount:2499,status:'Delivered',date:'21-Jun-26'},
+      {id:'#ORN1235',customer:'Ritu M.',product:'Pearl Necklace',amount:1899,status:'Shipped',date:'21-Jun-26'},
+      {id:'#ORN1236',customer:'Seema J.',product:'Silver Earrings',amount:999,status:'Pending',date:'20-Jun-26'},
+      {id:'#ORN1237',customer:'Pooja R.',product:'Bracelet',amount:1299,status:'Delivered',date:'19-Jun-26'},
+    ]}),
+    getNDR: () => ({rows:[
+      {awb:'DEL003',customer:'Mohit P.',product:'Bracelet',attempts:2,reason:'Not home',status:'NDR'},
+      {awb:'DEL004',customer:'Neha R.',product:'Ring',attempts:1,reason:'Wrong address',status:'RTO Initiated'},
+    ]}),
+    getRTOAnalytics: () => ({
+      monthly:[10,8,15,12,9,11,14,10,8,12,11,13],
+      byCourier:[{name:'Delhivery',rto:8},{name:'BlueDart',rto:14},{name:'Ekart',rto:12}],
+      byCategory:[{name:'Rings',rto:9},{name:'Necklaces',rto:13},{name:'Earrings',rto:7},{name:'Bracelets',rto:11}],
+      topReasons:[{reason:'Customer Refused',count:18},{reason:'Wrong Address',count:12},{reason:'Not Home',count:9},{reason:'Damaged',count:4}],
+    }),
+    getAttendance: () => ({rows:[
+      {date:'21-Jun-26',name:'Kavish Jain',checkIn:'09:55',checkOut:'19:02',status:'Present'},
+      {date:'21-Jun-26',name:'Sonu Kumar',checkIn:'10:05',checkOut:'--',status:'Present'},
+      {date:'21-Jun-26',name:'Mitali Sharma',checkIn:'10:12',checkOut:'--',status:'Present'},
+      {date:'21-Jun-26',name:'Ravi Gupta',checkIn:'--',checkOut:'--',status:'Absent'},
+    ]}),
+    getEmployees: () => ({rows:[
+      {id:'EMP001',name:'Kavish Jain',role:'Founder',dept:'Management',salary:0,status:'Active'},
+      {id:'EMP002',name:'Jayesh Jain',role:'Founder',dept:'Management',salary:0,status:'Active'},
+      {id:'EMP003',name:'Sonu Kumar',role:'Packing Staff',dept:'Operations',salary:18000,status:'Active'},
+      {id:'EMP004',name:'Mitali Sharma',role:'Packing Staff',dept:'Operations',salary:16000,status:'Active'},
+    ]}),
+    getLeave: () => ({rows:[
+      {id:'LV001',employee:'Sonu Kumar',type:'Sick Leave',from:'15-Jun-26',to:'16-Jun-26',days:2,status:'Approved'},
+      {id:'LV002',employee:'Mitali Sharma',type:'Casual Leave',from:'25-Jun-26',to:'25-Jun-26',days:1,status:'Pending'},
+    ]}),
+    getPayroll: () => ({rows:[
+      {month:'Jun-26',employee:'Sonu Kumar',basic:18000,absent:1,allowances:2000,deductions:0,net:19307},
+      {month:'Jun-26',employee:'Mitali Sharma',basic:16000,absent:0,allowances:1500,deductions:0,net:17500},
+    ]}),
+    getTraining: () => ({rows:[
+      {id:'TR001',title:'Product Knowledge',employee:'Sonu Kumar',date:'10-Jun-26',status:'Completed'},
+      {id:'TR002',title:'Customer Handling',employee:'Mitali Sharma',date:'25-Jun-26',status:'Scheduled'},
+    ]}),
+    getExpenses: () => ({rows:[
+      {id:'EXP001',date:'19-Jun-26',category:'Packaging',desc:'Bubble wrap rolls',amount:1200,by:'Jayesh Jain'},
+      {id:'EXP002',date:'18-Jun-26',category:'Marketing',desc:'Instagram ads',amount:5000,by:'Kavish Jain'},
+    ], total:6200}),
+    getBankStatements: () => ({rows:[
+      {date:'21-Jun-26',desc:'Shopify Payout',credit:45000,debit:0,balance:182000},
+      {date:'20-Jun-26',desc:'Office Rent',credit:0,debit:15000,balance:137000},
+      {date:'19-Jun-26',desc:'Shopify Payout',credit:38000,debit:0,balance:152000},
+    ]}),
+    getProducts: () => ({rows:[
+      {sku:'ORN-R-001',name:'Gold Plated Ring',category:'Rings',price:2499,stock:45,status:'Active'},
+      {sku:'ORN-N-001',name:'Pearl Necklace',category:'Necklaces',price:1899,stock:30,status:'Active'},
+      {sku:'ORN-E-001',name:'Silver Earrings',category:'Earrings',price:999,stock:60,status:'Active'},
+      {sku:'ORN-B-001',name:'Gold Bracelet',category:'Bracelets',price:1599,stock:25,status:'Active'},
+    ]}),
+    getCategories: () => ({rows:[
+      {id:'CAT001',name:'Rings',products:24,active:true},
+      {id:'CAT002',name:'Necklaces',products:18,active:true},
+      {id:'CAT003',name:'Earrings',products:32,active:true},
+      {id:'CAT004',name:'Bracelets',products:15,active:true},
+    ]}),
+    getShopifySync: () => ({lastSync:'21-Jun-26 14:30',ordersSync:128,productsSync:74,status:'OK',log:[
+      {time:'14:30',msg:'Synced 3 new orders from Shopify'},
+      {time:'14:00',msg:'Synced 1 product stock update'},
+      {time:'13:30',msg:'No new orders found'},
+    ]}),
+    getInfluencers: () => ({rows:[
+      {id:'INF001',name:'@priya.fashion',platform:'Instagram',followers:'45K',collab:'Ring Review Post',status:'Active',reach:'12K'},
+      {id:'INF002',name:'@jewelrylove',platform:'Instagram',followers:'22K',collab:'Necklace Unboxing',status:'Completed',reach:'6K'},
+    ]}),
+    getTasks: () => ({rows:[
+      {id:'TSK001',title:'Restock Gold Rings',priority:'High',assignee:'Kavish',due:'25-Jun-26',status:'Open'},
+      {id:'TSK002',title:'Instagram content plan July',priority:'Medium',assignee:'Jayesh',due:'30-Jun-26',status:'In Progress'},
+      {id:'TSK003',title:'Call Delhivery support',priority:'Low',assignee:'Sonu',due:'22-Jun-26',status:'Done'},
+      {id:'TSK004',title:'Monthly payroll run',priority:'High',assignee:'Jayesh',due:'30-Jun-26',status:'Open'},
+    ]}),
+    getCalendarEvents: () => ({events:[
+      {date:'2026-06-25',title:'Restock deadline'},
+      {date:'2026-06-28',title:'Influencer collab shoot'},
+      {date:'2026-06-30',title:'Month-end payroll'},
+      {date:'2026-07-01',title:'New month GST filing'},
+    ]}),
+    getSettings: () => ({shopifyStore:'ornaza.myshopify.com',whatsappKavish:'91XXXXXXXXXX',whatsappJayesh:'91XXXXXXXXXX',workingDays:26}),
+    markAttendance: () => ({success:true, message:'Attendance marked successfully!'}),
+    sendWhatsAppReport: () => ({kavishUrl:`https://wa.me/919999999999?text=${encodeURIComponent('Ornaza Daily Report\nOrders: 42\nRTO: 12.4%\nPickup: 37')}`,jayeshUrl:`https://wa.me/919999999998?text=${encodeURIComponent('Ornaza Daily Report\nOrders: 42\nRTO: 12.4%\nPickup: 37')}`}),
+    calculatePayroll: () => ({success:true, rows:[
+      {employee:'Sonu Kumar',basic:18000,absent:1,allowances:2000,deductions:0,net:19307},
+      {employee:'Mitali Sharma',basic:16000,absent:0,allowances:1500,deductions:0,net:17500},
+    ]}),
+  };
+  return new Promise(async (res, rej) => {
+    await delay();
+    const fn = mocks[action];
+    try { res(fn ? fn() : {success:true}); } catch(e) { rej(e); }
+  });
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function toast(msg, type = 'success') {
+  const c = {success:'#27ae60', error:'#e74c3c', warning:'#f39c12', info:'#2980b9'};
+  const el = Object.assign(document.createElement('div'), {textContent: msg});
+  el.style.cssText = `position:fixed;bottom:24px;right:20px;background:${c[type]||c.success};color:#fff;padding:12px 20px;border-radius:12px;font-size:.88rem;font-weight:600;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:300px;transition:opacity .3s`;
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.opacity='0'; setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+// ═══════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════
+async function login() {
+  const u = eid('loginUser').value.trim();
+  const p = eid('loginPass').value;
+  if (!u || !p) { toast('Enter username and password','error'); return; }
+  const btn = eid('loginBtn');
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+  try {
+    const r = await api('login', {username:u, password:p});
+    S.token = r.token; S.user = r.name; S.role = r.role;
+    localStorage.setItem('ornaza_session', JSON.stringify({token:r.token,name:r.name,role:r.role}));
+    showApp();
+  } catch(e) {
+    eid('loginErr').style.display = 'block';
+    eid('loginErr').textContent = e.message || 'Login failed';
+  } finally { btn.textContent = 'Sign In'; btn.disabled = false; }
+}
+
+function logout() {
+  S.token = null; S.user = null; S.role = null;
+  localStorage.removeItem('ornaza_session');
+  eid('app').style.display = 'none';
+  eid('login-screen').style.display = 'flex';
+  eid('loginErr').style.display = 'none';
+}
+
+function showApp() {
+  eid('login-screen').style.display = 'none';
+  eid('app').style.display = 'block';
+  eid('sidebarUser').textContent = S.user || 'User';
+  eid('userAvatar').textContent = (S.user||'U')[0].toUpperCase();
+  navigate('dashboard');
+}
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+const PAGE_TITLES = {
+  dashboard:'Dashboard', pickup:'Pickup / Cancel', orders:'Orders',
+  ndr:'NDR / Returns', rto:'RTO Analytics', attendance:'Attendance',
+  employees:'Employees', leave:'Leave', payroll:'Payroll', training:'Training',
+  expenses:'Expenses', bank:'Bank Statements', products:'Products',
+  categories:'Categories', shopify:'Shopify Sync', influencers:'Influencers',
+  tasks:'Tasks', calendar:'Calendar', settings:'Settings',
+};
+
+function navigate(page) {
+  S.page = page;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page));
+  eid('topbarTitle').textContent = PAGE_TITLES[page] || page;
+  closeSidebar();
+  renderPage(page);
+}
+
+async function renderPage(page) {
+  const content = eid('pageContent');
+  content.innerHTML = '<div class="loading"><i class="ti ti-loader"></i><br/>Loading&#8230;</div>';
+  const fns = {
+    dashboard:renderDashboard, pickup:renderPickup, orders:renderOrders,
+    ndr:renderNDR, rto:renderRTO, attendance:renderAttendance,
+    employees:renderEmployees, leave:renderLeave, payroll:renderPayroll,
+    training:renderTraining, expenses:renderExpenses, bank:renderBank,
+    products:renderProducts, categories:renderCategories, shopify:renderShopify,
+    influencers:renderInfluencers, tasks:renderTasks, calendar:renderCalendar,
+    settings:renderSettings,
+  };
+  try {
+    if (fns[page]) await fns[page](content);
+    else content.innerHTML = '<div class="empty-state"><i class="ti ti-tools"></i><br/>Coming soon</div>';
+  } catch(e) {
+    content.innerHTML = `<div class="empty-state"><i class="ti ti-alert-triangle"></i><br/>Error: ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════
+async function renderDashboard(el) {
+  const d = await api('getDashboard');
+  el.innerHTML = `
+  <div class="grid g4 mb-2">
+    <div class="card stat-card">
+      <div class="stat-icon" style="background:rgba(212,132,154,.15);color:var(--rose)"><i class="ti ti-shopping-cart"></i></div>
+      <div><div class="stat-val">${d.todayOrders}</div><div class="stat-label">Today's Orders</div></div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-icon" style="background:rgba(39,174,96,.12);color:#27ae60"><i class="ti ti-coin-rupee"></i></div>
+      <div><div class="stat-val">&#8377;${(d.totalRevenue/1000).toFixed(1)}K</div><div class="stat-label">Revenue (Month)</div></div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-icon" style="background:rgba(231,76,60,.1);color:#e74c3c"><i class="ti ti-alert-triangle"></i></div>
+      <div><div class="stat-val">${d.pendingNDR}</div><div class="stat-label">Pending NDR</div></div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-icon" style="background:rgba(243,156,18,.1);color:#f39c12"><i class="ti ti-package-off"></i></div>
+      <div><div class="stat-val">${d.rtoPct}%</div><div class="stat-label">RTO Rate</div></div>
+    </div>
+  </div>
+  <div class="grid g2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Recent Orders</div><button class="btn btn-sm btn-secondary" onclick="navigate('orders')">View All</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
+      <tbody>${d.recentOrders.map(o=>`<tr><td>${o.id}</td><td>${o.product}</td><td>&#8377;${o.amount}</td><td>${badge(o.status)}</td></tr>`).join('')}</tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Today at a Glance</div></div>
+      <div style="display:grid;gap:16px">
+        <div>
+          <div class="flex justify-between text-sm mb-1"><span>Staff Present</span><span class="font-bold">${d.attendanceToday}/${d.totalEmployees}</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(d.attendanceToday/d.totalEmployees*100)}%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-sm mb-1"><span>RTO Rate</span><span class="font-bold">${d.rtoPct}%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${d.rtoPct}%;background:linear-gradient(90deg,#f39c12,#e74c3c)"></div></div>
+        </div>
+        <div class="flex gap-2 mt-1">
+          <button class="btn btn-primary btn-sm" onclick="navigate('attendance')"><i class="ti ti-clock"></i> Attendance</button>
+          <button class="btn btn-secondary btn-sm" onclick="navigate('pickup')"><i class="ti ti-package"></i> Pickup Sheet</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  PICKUP / CANCEL — 5 tabs
+// ═══════════════════════════════════════════
+async function renderPickup(el) {
+  const tabs = ['PICKUP','RETURN','RECONCILE','Keep My Order','STAFF'];
+  el.innerHTML = `<div class="tabs">${tabs.map((t,i)=>`<div class="tab${i===S.pickupTab?' active':''}" onclick="switchPickupTab(${i})">${t}</div>`).join('')}</div><div id="ptc"></div>`;
+  await loadPickupTab(S.pickupTab);
+}
+
+function switchPickupTab(i) {
+  S.pickupTab = i;
+  document.querySelectorAll('.tab').forEach((t,j) => t.classList.toggle('active', j===i));
+  loadPickupTab(i);
+}
+
+async function loadPickupTab(i) {
+  const tc = eid('ptc'); if (!tc) return;
+  tc.innerHTML = '<div class="loading"><i class="ti ti-loader"></i></div>';
+  try {
+    if (i===0) {
+      const d = await api('getPickup');
+      tc.innerHTML = `<div class="flex justify-between mb-2"><div class="chip"><i class="ti ti-package"></i> ${d.rows.length} entries</div><button class="btn btn-primary btn-sm" onclick="openAddPickup()"><i class="ti ti-plus"></i> Add Entry</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>AWB</th><th>Product</th><th>City</th><th>Status</th></tr></thead>
+      <tbody>${d.rows.map(r=>`<tr><td>${r.date}</td><td>${r.awb}</td><td>${r.product}</td><td>${r.city}</td><td>${badge(r.status)}</td></tr>`).join('')||noRows(5)}</tbody></table></div>`;
+    } else if (i===1) {
+      const d = await api('getReturn');
+      tc.innerHTML = `<div class="flex justify-between mb-2"><div class="chip"><i class="ti ti-arrow-back-up"></i> ${d.rows.length} returns</div><button class="btn btn-primary btn-sm" onclick="openAddReturn()"><i class="ti ti-plus"></i> Add Return</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>AWB</th><th>Product</th><th>Reason</th><th>Status</th></tr></thead>
+      <tbody>${d.rows.map(r=>`<tr><td>${r.date}</td><td>${r.awb}</td><td>${r.product}</td><td>${r.reason}</td><td>${badge(r.status)}</td></tr>`).join('')||noRows(5)}</tbody></table></div>`;
+    } else if (i===2) {
+      const d = await api('getReconcile');
+      tc.innerHTML = `
+      <div class="grid g3 mb-2">
+        <div class="card stat-card"><div class="stat-icon" style="background:rgba(212,132,154,.12);color:var(--rose)"><i class="ti ti-package"></i></div><div><div class="stat-val">${d.totalPickup}</div><div class="stat-label">Total Pickup</div></div></div>
+        <div class="card stat-card"><div class="stat-icon" style="background:rgba(231,76,60,.1);color:#e74c3c"><i class="ti ti-arrow-back-up"></i></div><div><div class="stat-val">${d.totalReturn}</div><div class="stat-label">Total Return</div></div></div>
+        <div class="card stat-card"><div class="stat-icon" style="background:rgba(39,174,96,.12);color:#27ae60"><i class="ti ti-check"></i></div><div><div class="stat-val">${d.netPickup}</div><div class="stat-label">Net Pickup</div></div></div>
+      </div>
+      <div class="grid g2">
+        <div class="card"><div class="card-title mb-1">Return Rate</div><div style="font-size:2.5rem;font-weight:700;color:var(--rose-deep)">${d.returnRate}</div></div>
+        <div class="card"><div class="card-title mb-2">Packed Today</div><div class="flex gap-2"><div class="chip">Sonu: ${d.sonuPacked}</div><div class="chip">Mitali: ${d.mitaliPacked}</div></div></div>
+      </div>`;
+    } else if (i===3) {
+      const d = await api('getKeepMyOrder');
+      tc.innerHTML = `<div class="flex justify-between mb-2"><div class="chip">${d.rows.length} open requests</div><button class="btn btn-primary btn-sm" onclick="openKeepOrder()"><i class="ti ti-plus"></i> New Request</button></div>
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Customer</th><th>Product</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>${d.rows.map(r=>`<tr><td>${r.id}</td><td>${r.customer}</td><td>${r.product}</td><td>${r.date}</td><td>${badge(r.status)}</td><td><button class="btn btn-sm btn-success" onclick="resolveKeepOrder('${r.id}')">Resolve</button></td></tr>`).join('')||noRows(6)}</tbody></table></div>`;
+    } else if (i===4) {
+      const d = await api('getPickupStaff');
+      tc.innerHTML = `<div class="flex justify-between mb-2"><div class="chip">${d.rows.length} staff</div><button class="btn btn-primary btn-sm" onclick="openAddStaff()"><i class="ti ti-plus"></i> Log Staff</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Pickups</th><th>Date</th></tr></thead>
+      <tbody>${d.rows.map(r=>`<tr><td>${r.name}</td><td>${r.role}</td><td>${r.pickups}</td><td>${r.date}</td></tr>`).join('')||noRows(4)}</tbody></table></div>`;
+    }
+  } catch(e) { tc.innerHTML = `<div class="empty-state"><i class="ti ti-alert-triangle"></i><br/>${e.message}</div>`; }
+}
+
+function openAddPickup(){openModal('Add Pickup Entry',`<div class="form-row fr2"><div><label class="lbl">AWB Number</label><input class="inp" id="pAWB" placeholder="DEL001"/></div><div><label class="lbl">Product</label><input class="inp" id="pProduct"/></div><div><label class="lbl">City</label><input class="inp" id="pCity"/></div><div><label class="lbl">Status</label><select class="inp" id="pStat"><option>Picked</option><option>Pending</option></select></div></div>`,async()=>{await queueOrSend('addPickupEntry',{awb:v('pAWB'),product:v('pProduct'),city:v('pCity'),status:v('pStat')});closeModal();toast('Entry added');loadPickupTab(0);});}
+function openAddReturn(){openModal('Add Return Entry',`<div class="form-row fr2"><div><label class="lbl">AWB</label><input class="inp" id="rAWB"/></div><div><label class="lbl">Product</label><input class="inp" id="rProd"/></div><div><label class="lbl">Reason</label><input class="inp" id="rReason"/></div><div><label class="lbl">Status</label><select class="inp" id="rStat"><option>Returned</option><option>RTO</option></select></div></div>`,async()=>{await queueOrSend('addReturnEntry',{awb:v('rAWB'),product:v('rProd'),reason:v('rReason'),status:v('rStat')});closeModal();toast('Return added');loadPickupTab(1);});}
+function openKeepOrder(){openModal('New Keep My Order',`<div class="form-row fr2"><div><label class="lbl">Customer</label><input class="inp" id="koC"/></div><div><label class="lbl">Product</label><input class="inp" id="koP"/></div></div>`,async()=>{await queueOrSend('addKeepOrder',{customer:v('koC'),product:v('koP')});closeModal();toast('Request added');loadPickupTab(3);});}
+function openAddStaff(){openModal('Log Staff',`<div class="form-row fr2"><div><label class="lbl">Name</label><input class="inp" id="stN"/></div><div><label class="lbl">Role</label><input class="inp" id="stR" value="Packing"/></div><div><label class="lbl">Pickups</label><input class="inp" type="number" id="stP" value="0"/></div></div>`,async()=>{await queueOrSend('addPickupStaff',{name:v('stN'),role:v('stR'),pickups:v('stP')});closeModal();toast('Staff logged');loadPickupTab(4);});}
+async function resolveKeepOrder(id){await queueOrSend('resolveKeepOrder',{id});toast('Resolved');loadPickupTab(3);}
+
+// ═══════════════════════════════════════════
+//  ORDERS
+// ═══════════════════════════════════════════
+async function renderOrders(el) {
+  const d = await api('getOrders');
+  el.innerHTML = `
+  <div class="card mb-2"><div class="flex gap-2 items-center">
+    <input class="inp" style="max-width:220px" id="orderSrch" placeholder="Search orders&#8230;" oninput="filterTable('orderSrch','orderTb')"/>
+    <select class="inp" style="max-width:160px"><option>All Status</option><option>Delivered</option><option>Shipped</option><option>Pending</option></select>
+  </div></div>
+  <div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+  <tbody id="orderTb">${d.rows.map(r=>`<tr><td>${r.id}</td><td>${r.customer}</td><td>${r.product}</td><td>&#8377;${r.amount}</td><td>${badge(r.status)}</td><td>${r.date}</td></tr>`).join('')||noRows(6)}</tbody></table></div>`;
+}
+
+// ═══════════════════════════════════════════
+//  NDR
+// ═══════════════════════════════════════════
+async function renderNDR(el) {
+  const d = await api('getNDR');
+  el.innerHTML = `<div class="flex justify-between mb-2"><div class="chip"><i class="ti ti-alert-triangle"></i> ${d.rows.length} active NDR</div><button class="btn btn-primary btn-sm" onclick="doSyncDelhivery()"><i class="ti ti-refresh"></i> Sync Delhivery</button></div>
+  <div class="table-wrap"><table><thead><tr><th>AWB</th><th>Customer</th><th>Product</th><th>Attempts</th><th>Reason</th><th>Status</th></tr></thead>
+  <tbody>${d.rows.map(r=>`<tr><td>${r.awb}</td><td>${r.customer}</td><td>${r.product}</td><td>${r.attempts}</td><td>${r.reason}</td><td>${badge(r.status)}</td></tr>`).join('')||noRows(6)}</tbody></table></div>`;
+}
+async function doSyncDelhivery(){toast('Syncing Delhivery&#8230;','info');await api('syncDelhivery');toast('NDR synced');renderPage('ndr');}
+
+// ═══════════════════════════════════════════
+//  RTO ANALYTICS
+// ═══════════════════════════════════════════
+async function renderRTO(el) {
+  const d = await api('getRTOAnalytics');
+  el.innerHTML = `
+  <div class="grid g2 mb-2">
+    <div class="card"><div class="card-title mb-2">Monthly RTO % (Last 12 Months)</div><canvas id="rtoM" height="200"></canvas></div>
+    <div class="card"><div class="card-title mb-2">RTO by Courier</div><canvas id="rtoC" height="200"></canvas></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><div class="card-title mb-2">RTO by Category</div><canvas id="rtoCat" height="200"></canvas></div>
+    <div class="card"><div class="card-title mb-2">Top Return Reasons</div>
+      ${d.topReasons.map(r=>`<div class="mb-2"><div class="flex justify-between text-sm mb-1"><span>${r.reason}</span><span class="font-bold">${r.count}</span></div><div class="progress-bar"><div class="progress-fill" style="width:${Math.round(r.count/d.topReasons[0].count*100)}%"></div></div></div>`).join('')}
+    </div>
+  </div>`;
+  setTimeout(()=>{
+    new Chart(eid('rtoM'),{type:'line',data:{labels:['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'],datasets:[{label:'RTO %',data:d.monthly,borderColor:'#D4849A',backgroundColor:'rgba(212,132,154,.1)',tension:.4,fill:true,pointBackgroundColor:'#8B3A54'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+    new Chart(eid('rtoC'),{type:'bar',data:{labels:d.byCourier.map(x=>x.name),datasets:[{data:d.byCourier.map(x=>x.rto),backgroundColor:['#D4849A','#8B3A54','#C9896A']}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+    new Chart(eid('rtoCat'),{type:'doughnut',data:{labels:d.byCategory.map(x=>x.name),datasets:[{data:d.byCategory.map(x=>x.rto),backgroundColor:['#D4849A','#8B3A54','#C9896A','#f39c12']}]},options:{responsive:true}});
+  },50);
+}
+
+// ═══════════════════════════════════════════
+//  ATTENDANCE
+// ═══════════════════════════════════════════
+let gpsPos = null;
+async function renderAttendance(el) {
+  const d = await api('getAttendance');
+  const now = new Date();
+  el.innerHTML = `
+  <div class="grid g2 mb-2">
+    <div class="card">
+      <div class="attend-clock">
+        <div class="clock-time" id="liveClock">${fmt24(now)}</div>
+        <div class="clock-date">${now.toDateString()}</div>
+        <div class="gps-indicator" id="gpsInd"><div class="gps-dot" id="gpsDot"></div><span id="gpsTxt">Checking location&#8230;</span></div>
+        <div class="attend-btns">
+          <button class="btn btn-primary" onclick="doAttendance('checkin')"><i class="ti ti-clock-check"></i> Check In</button>
+          <button class="btn btn-secondary" onclick="doAttendance('checkout')"><i class="ti ti-clock-off"></i> Check Out</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title mb-2">Today's Attendance</div>
+      <div class="table-wrap"><table><thead><tr><th>Employee</th><th>In</th><th>Out</th><th>Status</th></tr></thead>
+      <tbody>${d.rows.map(r=>`<tr><td>${r.name}</td><td>${r.checkIn}</td><td>${r.checkOut}</td><td>${badge(r.status)}</td></tr>`).join('')}</tbody></table></div>
+    </div>
+  </div>`;
+  setInterval(()=>{const c=eid('liveClock');if(c)c.textContent=fmt24(new Date());},1000);
+  if(navigator.geolocation){
+    navigator.geolocation.watchPosition(pos=>{
+      gpsPos = pos;
+      const dist = haversineJS(pos.coords.latitude,pos.coords.longitude,28.6139,77.2090);
+      const ok = dist<=10;
+      const dot=eid('gpsDot'),txt=eid('gpsTxt');
+      if(dot) dot.className='gps-dot '+(ok?'ok':'err');
+      if(txt) txt.textContent = ok?'In office radius ✓':`${Math.round(dist)}m from office (need ≤10m)`;
+    },()=>{const t=eid('gpsTxt');if(t)t.textContent='GPS not available';});
+  }
+}
+
+function fmt24(d){return d.toLocaleTimeString('en-IN',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function haversineJS(la1,ln1,la2,ln2){const R=6371000,dL=(la2-la1)*Math.PI/180,dN=(ln2-ln1)*Math.PI/180,a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+
+function doAttendance(type){
+  if(!gpsPos&&CONFIG.API_URL){toast('Waiting for GPS location&#8230;','warning');return;}
+  openCameraModal(type);
+}
+
+let camStream=null,camStep=1,camSelfie=null,camAttendType=null;
+function openCameraModal(type){
+  camStep=1;camSelfie=null;camAttendType=type;
+  eid('camStep').textContent='1';eid('camStepLabel').textContent='Take selfie (front camera)';
+  eid('cameraModal').classList.add('open');
+  startCamera('user');
+  eid('camCaptureBtn').onclick=()=>captureStep();
+  eid('camCancelBtn').onclick=stopCamera;
+}
+async function startCamera(facing='user'){
+  try{camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:facing},audio:false});eid('camVideo').srcObject=camStream;}
+  catch{toast('Camera not available','error');eid('cameraModal').classList.remove('open');}
+}
+function stopCamera(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}eid('cameraModal').classList.remove('open');}
+function captureStep(){
+  const vid=eid('camVideo'),can=eid('camCanvas');
+  can.width=vid.videoWidth;can.height=vid.videoHeight;
+  can.getContext('2d').drawImage(vid,0,0);
+  const data=can.toDataURL('image/jpeg',.6);
+  if(camStep===1){
+    camSelfie=data;camStep=2;
+    eid('camStep').textContent='2';eid('camStepLabel').textContent='Show Shop 2037 plate (rear camera)';
+    if(camStream)camStream.getTracks().forEach(t=>t.stop());
+    startCamera('environment');
+  } else {
+    const plate=data;stopCamera();
+    submitAttendance(camAttendType,plate);
+  }
+}
+async function submitAttendance(type,platePic){
+  try{
+    const r=await queueOrSend('markAttendance',{type,lat:gpsPos?gpsPos.coords.latitude:28.6139,lng:gpsPos?gpsPos.coords.longitude:77.2090,selfie:camSelfie||'',plate:platePic||''});
+    toast(r?.message||`${type==='checkin'?'Check-in':'Check-out'} marked!`);
+    renderPage('attendance');
+  }catch(e){toast(e.message,'error');}
+}
+
+// ═══════════════════════════════════════════
+//  EMPLOYEES
+// ═══════════════════════════════════════════
+async function renderEmployees(el){
+  const d=await api('getEmployees');
+  el.innerHTML=`<div class="flex justify-between mb-2"><input class="inp" style="max-width:220px" id="empSrch" placeholder="Search&#8230;" oninput="filterTable('empSrch','empTb')"/><button class="btn btn-primary btn-sm" onclick="openAddEmployee()"><i class="ti ti-plus"></i> Add Employee</button></div>
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Role</th><th>Dept</th><th>Salary</th><th>Status</th></tr></thead>
+  <tbody id="empTb">${d.rows.map(r=>`<tr><td>${r.id}</td><td>${r.name}</td><td>${r.role}</td><td>${r.dept}</td><td>${r.salary?'&#8377;'+r.salary.toLocaleString():'&#8212;'}</td><td>${badge(r.status)}</td></tr>`).join('')||noRows(6)}</tbody></table></div>`;
+}
+function openAddEmployee(){openModal('Add Employee',`<div class="form-row fr2"><div><label class="lbl">Full Name</label><input class="inp" id="eN"/></div><div><label class="lbl">Role</label><input class="inp" id="eR"/></div><div><label class="lbl">Department</label><input class="inp" id="eD"/></div><div><label class="lbl">Basic Salary (&#8377;)</label><input class="inp" type="number" id="eS"/></div><div><label class="lbl">Username</label><input class="inp" id="eU"/></div><div><label class="lbl">Password</label><input class="inp" type="password" id="eP"/></div></div>`,async()=>{await queueOrSend('addEmployee',{name:v('eN'),role:v('eR'),dept:v('eD'),salary:v('eS'),username:v('eU'),password:v('eP')});closeModal();toast('Employee added');renderPage('employees');});}
+
+// ═══════════════════════════════════════════
+//  LEAVE
+// ═══════════════════════════════════════════
+async function renderLeave(el){
+  const d=await api('getLeave');
+  el.innerHTML=`<div class="flex justify-between mb-2"><div class="chip">${d.rows.filter(r=>r.status==='Pending').length} pending</div><button class="btn btn-primary btn-sm" onclick="openApplyLeave()"><i class="ti ti-plus"></i> Apply Leave</button></div>
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Status</th>${S.role==='founder'?'<th>Action</th>':''}</tr></thead>
+  <tbody>${d.rows.map(r=>`<tr><td>${r.id}</td><td>${r.employee}</td><td>${r.type}</td><td>${r.from}</td><td>${r.to}</td><td>${r.days}</td><td>${badge(r.status)}</td>${S.role==='founder'?`<td>${r.status==='Pending'?`<button class="btn btn-sm btn-success" onclick="approveLeave('${r.id}')">Approve</button>`:'&#8212;'}</td>`:''}</tr>`).join('')||noRows(S.role==='founder'?8:7)}</tbody></table></div>`;
+}
+function openApplyLeave(){openModal('Apply Leave',`<div class="form-row fr2"><div><label class="lbl">Employee</label><input class="inp" id="lvE" value="${S.user||''}"/></div><div><label class="lbl">Type</label><select class="inp" id="lvT"><option>Sick Leave</option><option>Casual Leave</option><option>Annual Leave</option><option>Unpaid Leave</option></select></div><div><label class="lbl">From</label><input class="inp" type="date" id="lvF"/></div><div><label class="lbl">To</label><input class="inp" type="date" id="lvTo"/></div><div style="grid-column:1/-1"><label class="lbl">Reason</label><textarea class="inp" id="lvR" rows="2"></textarea></div></div>`,async()=>{await queueOrSend('applyLeave',{employee:v('lvE'),type:v('lvT'),from:v('lvF'),to:v('lvTo'),reason:v('lvR')});closeModal();toast('Leave submitted');renderPage('leave');});}
+async function approveLeave(id){await queueOrSend('updateLeave',{id,status:'Approved'});toast('Leave approved');renderPage('leave');}
+
+// ═══════════════════════════════════════════
+//  PAYROLL
+// ═══════════════════════════════════════════
+async function renderPayroll(el){
+  const d=await api('getPayroll');
+  const now=new Date();
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  el.innerHTML=`<div class="card mb-2">
+    <div class="card-title mb-2">Run Payroll</div>
+    <div class="flex gap-2 items-center">
+      <select class="inp" style="max-width:160px" id="pyM">${months.map((m,i)=>`<option value="${i+1}"${i===now.getMonth()?' selected':''}>${m} ${now.getFullYear()}</option>`).join('')}</select>
+      <button class="btn btn-primary" onclick="runPayroll()"><i class="ti ti-calculator"></i> Calculate</button>
+      ${S.role==='founder'?'<button class="btn btn-secondary" onclick="sendWAReport()"><i class="ti ti-brand-whatsapp"></i> WhatsApp Report</button>':''}
+    </div>
+    <p class="text-sm text-muted mt-1">Formula: Net = Basic &#8722; (Absent &#215; Basic &#247; 26) + Allowances &#8722; Deductions</p>
+  </div>
+  <div class="table-wrap"><table><thead><tr><th>Month</th><th>Employee</th><th>Basic</th><th>Absent</th><th>Allowances</th><th>Deductions</th><th>Net Pay</th></tr></thead>
+  <tbody id="pyTb">${d.rows.map(r=>`<tr><td>${r.month}</td><td>${r.employee}</td><td>&#8377;${r.basic.toLocaleString()}</td><td>${r.absent}</td><td>&#8377;${r.allowances.toLocaleString()}</td><td>&#8377;${r.deductions.toLocaleString()}</td><td><strong>&#8377;${r.net.toLocaleString()}</strong></td></tr>`).join('')||noRows(7)}</tbody></table></div>`;
+}
+async function runPayroll(){
+  const r=await api('calculatePayroll',{month:v('pyM')});
+  if(r.rows){const sel=eid('pyM');const mLabel=sel.options[sel.selectedIndex].text;eid('pyTb').innerHTML=r.rows.map(r=>`<tr><td>${mLabel}</td><td>${r.employee}</td><td>&#8377;${r.basic.toLocaleString()}</td><td>${r.absent}</td><td>&#8377;${r.allowances.toLocaleString()}</td><td>&#8377;${r.deductions.toLocaleString()}</td><td><strong>&#8377;${r.net.toLocaleString()}</strong></td></tr>`).join('');}
+  toast('Payroll calculated');
+}
+async function sendWAReport(){const r=await api('sendWhatsAppReport');window.open(r.kavishUrl,'_blank');toast('WhatsApp opening&#8230;');}
+
+// ═══════════════════════════════════════════
+//  TRAINING
+// ═══════════════════════════════════════════
+async function renderTraining(el){
+  const d=await api('getTraining');
+  el.innerHTML=`<div class="flex justify-between mb-2"><div class="chip">${d.rows.length} sessions</div><button class="btn btn-primary btn-sm" onclick="openAddTraining()"><i class="ti ti-plus"></i> Add Training</button></div>
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Title</th><th>Employee</th><th>Date</th><th>Status</th></tr></thead>
+  <tbody>${d.rows.map(r=>`<tr><td>${r.id}</td><td>${r.title}</td><td>${r.employee}</td><td>${r.date}</td><td>${badge(r.status)}</td></tr>`).join('')||noRows(5)}</tbody></table></div>`;
+}
+function openAddTraining(){openModal('Add Training Session',`<div class="form-row fr2"><div><label class="lbl">Title</label><input class="inp" id="trT"/></div><div><label class="lbl">Employee</label><input class="inp" id="trE"/></div><div><label class="lbl">Date</label><input class="inp" type="date" id="trD"/></div><div><label class="lbl">Status</label><select class="inp" id="trS"><option>Scheduled</option><option>Completed</option></select></div></div>`,async()=>{await queueOrSend('addTraining',{title:v('trT'),employee:v('trE'),date:v('trD'),status:v('trS')});closeModal();toast('Training added');renderPage('training');});}
+
+// ═══════════════════════════════════════════
+//  EXPENSES
+// ═══════════════════════════════════════════
+async function renderExpenses(el){
+  const d=await api('getExpenses');
+  el.innerHTML=`<div class="grid g2 mb-2">
+    <div class="card stat-card"><div class="stat-icon" style="background:rgba(231,76,60,.1);color:#e74c3c"><i class="ti ti-receipt"></i></div><div><div class="stat-val">&#8377;${d.total.toLocaleString()}</div><div class="stat-label">This Month Total</div></div></div>
+    <div class="card" style="display:flex;align-items:center;justify-content:flex-end"><button class="btn btn-primary" onclick="openAddExpense()"><i class="ti ti-plus"></i> Add Expense</button></div>
+  </div>
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th>Added By</th></tr></thead>
+  <tbody>${d.rows.map(r=>`<tr><td>${r.id}</td><td>${r.date}</td><td>${r.category}</td><td>${r.desc}</td><td>&#8377;${r.amount.toLocaleString()}</td><td>${r.by}</td></tr>`).join('')||noRows(6)}</tbody></table></div>`;
+}
+function openAddExpense(){openModal('Add Expense',`<div class="form-row fr2"><div><label class="lbl">Category</label><select class="inp" id="exC"><option>Packaging</option><option>Marketing</option><option>Shipping</option><option>Rent</option><option>Salaries</option><option>Other</option></select></div><div><label class="lbl">Amount (&#8377;)</label><input class="inp" type="number" id="exA"/></div><div style="grid-column:1/-1"><label class="lbl">Description</label><input class="inp" id="exD"/></div></div>`,async()=>{await queueOrSend('addExpense',{category:v('exC'),amount:v('exA'),desc:v('exD'),by:S.user});closeModal();toast('Expense added');renderPage('expenses');});}
+
+// ═══════════════════════════════════════════
+//  BANK STATEMENTS
+// ═══════════════════════════════════════════
+async function renderBank(el){
+  const d=await api('getBankStatements');
+  el.innerHTML=`<div class="flex justify-between mb-2"><div class="chip"><i class="ti ti-building-bank"></i> Bank Account</div><button class="btn btn-secondary btn-sm"><i class="ti ti-upload"></i> Upload Statement</button></div>
+  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Description</th><th>Credit</th><th>Debit</th><th>Balance</th></tr></thead>
+  <tbody>${d.rows.map(r=>`<tr><td>${r.date}</td><td>${r.desc}</td><td>${r.credit?'<span style="color:#27ae60">&#8377;'+r.credit.toLocaleString()+'</span>':'&#8212;'}</td><td>${r.debit?'<span style="color:#e74c3c">&#8377;'+r.debit.toLocaleString()+'</span>':'&#8212;'}</td><td>&#8377;${r.balance.toLocaleString()}</td></tr>`).join('')||noRows(5)}</tbody></table></div>`;
+}
+
+// ═══════════════════════════════════════════
+//  PRODUCTS
+// ═══════════════════════════════════════════
+async function renderProducts(el){
+  const d=await api('getProducts');
+  el.innerHTML=`<div class="flex justify-between mb-2"><input class="inp" style="max-width:220px" id="prSrch" placeholder="Search products&#8230;" oninput="filterTable('prSrch','prTb')"/><button class="btn btn-primary btn-sm" onclick="openAddProduct()"><i class="ti ti-plus"></i> Add Product</button></div>
+  <div class="table-wrap"><table><thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th></tr></thead>
+  <tbody id="prTb">${d.rows.map(r=>`<tr><td>${r.sku}</td><td>${r.name}</td><td>${r.category}</td><td>&#8377;${r.price}</td><td>${r.stock}</td><td>${badge(r.status)}</td></tr>`).join('')||noRows(6)}</tbody></table></div>`;
+}
+function openAddProduct(){openModal('Add Product',`<div class="form-row fr2"><div><label class="lbl">SKU</label><input class="inp" id="prK" placeholder="ORN-R-002"/></div><div><label class="lbl">Name</label><input class="inp" id="prN"/></div><div><label class="lbl">Category</label><input class="inp" id="prC"/></div><div><label class="lbl">Price (&#8377;)</label><input class="inp" type="number" id="prP"/></div><div><label class="lbl">Stock</label><input class="inp" type="number" id="prSt" value="0"/></div></div>`,async()=>{await queueOrSend('addProduct',{sku:v('prK'),name:v('prN'),category:v('prC'),price:v('prP'),stock:v('prSt')});closeModal();toast('Product added');renderPage('products');});}
+
+// ═══════════════════════════════════════════
+//  CATEGORIES
+// ═══════════════════════════════════════════
+async function renderCategories(el){
+  const d=await api('getCategories');
+  el.innerHTML=`<div class="flex justify-between mb-2"><div class="chip">${d.rows.length} categories</div><button class="btn btn-primary btn-sm" onclick="openAddCategory()"><i class="ti ti-plus"></i> Add Category</button></div>
+  <div class="grid g3">${d.rows.map(r=>`<div class="card"><div class="flex justify-between items-center mb-2"><div class="font-bold">${r.name}</div>${badge(r.active?'Active':'Inactive')}</div><div class="text-muted text-sm">${r.products} products</div></div>`).join('')}</div>`;
+}
+function openAddCategory(){openModal('Add Category',`<div><label class="lbl">Category Name</label><input class="inp" id="catN"/></div>`,async()=>{await queueOrSend('addCategory',{name:v('catN')});closeModal();toast('Category added');renderPage('categories');});}
+
+// ═══════════════════════════════════════════
+//  SHOPIFY SYNC
+// ═══════════════════════════════════════════
+async function renderShopify(el){
+  const d=await api('getShopifySync');
+  el.innerHTML=`<div class="grid g3 mb-2">
+    <div class="card stat-card"><div class="stat-icon" style="background:rgba(39,174,96,.12);color:#27ae60"><i class="ti ti-shopping-cart"></i></div><div><div class="stat-val">${d.ordersSync}</div><div class="stat-label">Orders Synced</div></div></div>
+    <div class="card stat-card"><div class="stat-icon" style="background:rgba(212,132,154,.12);color:var(--rose)"><i class="ti ti-diamond"></i></div><div><div class="stat-val">${d.productsSync}</div><div class="stat-label">Products Synced</div></div></div>
+    <div class="card stat-card"><div class="stat-icon" style="background:rgba(39,174,96,.12);color:#27ae60"><i class="ti ti-cloud-check"></i></div><div><div class="stat-val">${badge(d.status)}</div><div class="stat-label">API Status</div></div></div>
+  </div>
+  <div class="card mb-2"><div class="flex justify-between items-center"><div><div class="card-title">Last Sync: ${d.lastSync}</div><div class="text-muted text-sm">Auto-syncs every 30 minutes via GAS trigger</div></div><button class="btn btn-primary" onclick="doShopifySync()"><i class="ti ti-refresh"></i> Sync Now</button></div></div>
+  <div class="card"><div class="card-title mb-2">Sync Log</div>${d.log.map(l=>`<div class="flex gap-2 items-center mb-1 text-sm"><span class="text-muted">${l.time}</span><span>${l.msg}</span></div>`).join('')}</div>`;
+}
+async function doShopifySync(){toast('Syncing with Shopify&#8230;','info');const r=await api('syncShopify');toast(r.message||'Shopify synced');renderPage('shopify');}
+
+// ═══════════════════════════════════════════
+//  INFLUENCERS
+// ═══════════════════════════════════════════
+async function renderInfluencers(el){
+  const d=await api('getInfluencers');
+  el.innerHTML=`<div class="flex justify-between mb-2"><div class="chip">${d.rows.length} influencers</div><button class="btn btn-primary btn-sm" onclick="openAddInfluencer()"><i class="ti ti-plus"></i> Add Influencer</button></div>
+  <div class="table-wrap"><table><thead><tr><th>Handle</th><th>Platform</th><th>Followers</th><th>Collaboration</th><th>Reach</th><th>Status</th></tr></thead>
+  <tbody>${d.rows.map(r=>`<tr><td>${r.name}</td><td>${r.platform}</td><td>${r.followers}</td><td>${r.collab}</td><td>${r.reach}</td><td>${badge(r.status)}</td></tr>`).join('')||noRows(6)}</tbody></table></div>`;
+}
+function openAddInfluencer(){openModal('Add Influencer',`<div class="form-row fr2"><div><label class="lbl">Handle</label><input class="inp" id="ifH" placeholder="@handle"/></div><div><label class="lbl">Platform</label><select class="inp" id="ifPl"><option>Instagram</option><option>YouTube</option><option>TikTok</option></select></div><div><label class="lbl">Followers</label><input class="inp" id="ifF" placeholder="10K"/></div><div><label class="lbl">Collaboration</label><input class="inp" id="ifC"/></div></div>`,async()=>{await queueOrSend('addInfluencer',{name:v('ifH'),platform:v('ifPl'),followers:v('ifF'),collab:v('ifC')});closeModal();toast('Influencer added');renderPage('influencers');});}
+
+// ═══════════════════════════════════════════
+//  TASKS
+// ═══════════════════════════════════════════
+async function renderTasks(el){
+  const d=await api('getTasks');
+  el.innerHTML=`<div class="flex justify-between mb-2"><div class="flex gap-2"><div class="chip">${d.rows.filter(r=>r.status==='Open').length} open</div><div class="chip">${d.rows.filter(r=>r.status==='In Progress').length} in progress</div></div><button class="btn btn-primary btn-sm" onclick="openAddTask()"><i class="ti ti-plus"></i> Add Task</button></div>
+  <div class="grid g3">${['Open','In Progress','Done'].map(st=>`<div class="card"><div class="card-title mb-2">${st}</div>${d.rows.filter(r=>r.status===st).map(r=>`<div style="padding:10px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;background:var(--bg)"><div class="font-bold text-sm">${r.title}</div><div class="flex justify-between mt-1"><span class="text-muted text-sm">${r.assignee}</span><span class="badge badge-${r.priority==='High'?'red':r.priority==='Medium'?'yellow':'gray'}">${r.priority}</span></div><div class="text-muted text-sm mt-1">Due: ${r.due}</div></div>`).join('')||'<div class="text-muted text-sm">No tasks</div>'}</div>`).join('')}</div>`;
+}
+function openAddTask(){openModal('Add Task',`<div class="form-row fr2"><div style="grid-column:1/-1"><label class="lbl">Task Title</label><input class="inp" id="tkT"/></div><div><label class="lbl">Assignee</label><input class="inp" id="tkA" value="${S.user||''}"/></div><div><label class="lbl">Priority</label><select class="inp" id="tkP"><option>High</option><option>Medium</option><option>Low</option></select></div><div><label class="lbl">Due Date</label><input class="inp" type="date" id="tkD"/></div></div>`,async()=>{await queueOrSend('addTask',{title:v('tkT'),assignee:v('tkA'),priority:v('tkP'),due:v('tkD')});closeModal();toast('Task added');renderPage('tasks');});}
+
+// ═══════════════════════════════════════════
+//  CALENDAR
+// ═══════════════════════════════════════════
+let calEvts=[];
+async function renderCalendar(el){
+  const d=await api('getCalendarEvents');
+  calEvts=d.events||[];
+  drawCal(el);
+}
+function drawCal(el){
+  const y=S.calYear,m=S.calMonth;
+  const mn=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const fd=new Date(y,m,1).getDay();const dim=new Date(y,m+1,0).getDate();const today=new Date();
+  const prev=(fd===0?6:fd-1);const pd=new Date(y,m,0).getDate();
+  let days='';
+  for(let i=prev-1;i>=0;i--)days+=`<div class="cal-day other-month"><div class="cal-day-num">${pd-i}</div></div>`;
+  for(let d=1;d<=dim;d++){
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const ev=calEvts.filter(e=>e.date===ds);
+    const it=d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear();
+    days+=`<div class="cal-day${it?' today':''}" onclick="addCalEvt('${ds}')"><div class="cal-day-num">${d}</div>${ev.map(e=>`<div class="cal-event-dot">&#8226; ${e.title}</div>`).join('')}</div>`;
+  }
+  el.innerHTML=`<div class="card"><div class="flex justify-between items-center mb-2"><button class="btn btn-secondary btn-sm" onclick="calNav(-1)">&#8249; Prev</button><div class="font-bold">${mn[m]} ${y}</div><button class="btn btn-secondary btn-sm" onclick="calNav(1)">Next &#8250;</button></div>
+  <div class="cal-grid">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="cal-day-head">${d}</div>`).join('')}${days}</div>
+  <p class="text-muted text-sm mt-2">Tap any date to add an event</p></div>`;
+}
+function calNav(dir){S.calMonth+=dir;if(S.calMonth<0){S.calMonth=11;S.calYear--;}if(S.calMonth>11){S.calMonth=0;S.calYear++;}drawCal(eid('pageContent'));}
+function addCalEvt(date){openModal(`Add Event — ${date}`,`<div><label class="lbl">Event Title</label><input class="inp" id="evT" placeholder="Team meeting&#8230;"/></div>`,async()=>{await queueOrSend('addCalendarEvent',{date,title:v('evT')});calEvts.push({date,title:v('evT')});closeModal();toast('Event added');drawCal(eid('pageContent'));});}
+
+// ═══════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════
+async function renderSettings(el){
+  const d=await api('getSettings');
+  el.innerHTML=`<div class="grid g2">
+    <div class="card">
+      <div class="card-title mb-2">API Configuration</div>
+      <div class="form-row">
+        <div><label class="lbl">GAS Web App URL</label><input class="inp" id="cfAPI" value="${CONFIG.API_URL}" placeholder="https://script.google.com/macros/s/&#8230;/exec"/></div>
+        <div><label class="lbl">Shopify Store</label><input class="inp" id="cfShop" value="${d.shopifyStore}"/></div>
+        <div><label class="lbl">Shopify Access Token</label><input class="inp" type="password" id="cfTok" placeholder="shpat_&#8230;"/></div>
+        <div><label class="lbl">Delhivery Token</label><input class="inp" type="password" id="cfDel" placeholder="Token&#8230;"/></div>
+      </div>
+      <button class="btn btn-primary mt-2" onclick="saveAPISettings()"><i class="ti ti-device-floppy"></i> Save</button>
+    </div>
+    <div class="card">
+      <div class="card-title mb-2">WhatsApp Reports (7 PM daily)</div>
+      <div class="form-row">
+        <div><label class="lbl">Kavish's Number</label><input class="inp" id="cfWK" value="${d.whatsappKavish}" placeholder="91XXXXXXXXXX"/></div>
+        <div><label class="lbl">Jayesh's Number</label><input class="inp" id="cfWJ" value="${d.whatsappJayesh}" placeholder="91XXXXXXXXXX"/></div>
+        <div><label class="lbl">Working Days / Month</label><input class="inp" type="number" id="cfWD" value="${d.workingDays}"/></div>
+      </div>
+      <button class="btn btn-primary mt-2" onclick="saveRptSettings()"><i class="ti ti-device-floppy"></i> Save</button>
+    </div>
+    <div class="card">
+      <div class="card-title mb-2">Account</div>
+      <div class="text-sm mb-2"><strong>Logged in as:</strong> ${S.user} (${S.role})</div>
+      <div class="flex gap-2">
+        <button class="btn btn-danger btn-sm" onclick="logout()"><i class="ti ti-logout"></i> Logout</button>
+        ${S.role==='founder'?'<button class="btn btn-secondary btn-sm" onclick="doSetupSheets()"><i class="ti ti-database"></i> Init Sheets</button>':''}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title mb-2">Auto-Triggers (GAS)</div>
+      <div class="text-sm text-muted mb-2">Run once from GAS editor to set up auto Shopify/Delhivery sync every 30 min and WhatsApp report at 7 PM IST.</div>
+      ${S.role==='founder'?'<button class="btn btn-secondary btn-sm" onclick="doSetupTriggers()"><i class="ti ti-clock"></i> Setup Triggers</button>':'<div class="text-muted text-sm">Founder access only</div>'}
+    </div>
+  </div>`;
+}
+function saveAPISettings(){CONFIG.API_URL=v('cfAPI').trim();localStorage.setItem('ornaza_api_url',CONFIG.API_URL);queueOrSend('updateSettings',{shopifyStore:v('cfShop'),shopifyToken:v('cfTok'),delhiveryToken:v('cfDel')});toast('API settings saved');}
+function saveRptSettings(){queueOrSend('updateSettings',{whatsappKavish:v('cfWK'),whatsappJayesh:v('cfWJ'),workingDays:v('cfWD')});toast('Report settings saved');}
+async function doSetupSheets(){toast('Initializing sheets&#8230;','info');await api('setupSheets');toast('Sheets ready!');}
+async function doSetupTriggers(){toast('Setting up triggers&#8230;','info');await api('setupTriggers');toast('GAS triggers created');}
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+const eid = id => document.getElementById(id);
+const v = id => { const e=eid(id); return e?e.value:''; };
+const noRows = cols => `<tr><td colspan="${cols}" style="text-align:center;color:var(--muted);padding:24px">No data found</td></tr>`;
+
+const BADGE_MAP = {Delivered:'green',Shipped:'blue',Pending:'yellow',Cancelled:'red',RTO:'red','RTO Initiated':'red',NDR:'yellow',Present:'green',Absent:'red',Approved:'green',Pending:'yellow',Open:'yellow','In Progress':'blue',Done:'green',Active:'green',Completed:'green',Scheduled:'blue',OK:'green',Returned:'red'};
+function badge(s){return `<span class="badge badge-${BADGE_MAP[s]||'gray'}">${s}</span>`;}
+
+function filterTable(inputId,tbodyId){
+  const q=eid(inputId).value.toLowerCase();
+  document.querySelectorAll('#'+tbodyId+' tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none');
+}
+
+function openModal(title,bodyHTML,onConfirm){
+  eid('genericModalTitle').textContent=title;
+  eid('genericModalBody').innerHTML=bodyHTML;
+  const cb=eid('genericModalConfirm');
+  if(onConfirm){cb.classList.remove('hidden');cb.onclick=onConfirm;}else cb.classList.add('hidden');
+  eid('genericModal').classList.add('open');
+}
+function closeModal(){eid('genericModal').classList.remove('open');}
+
+// ═══════════════════════════════════════════
+//  SEARCH
+// ═══════════════════════════════════════════
+const PAGES=[
+  {l:'Dashboard',p:'dashboard',i:'ti-layout-dashboard'},
+  {l:'Pickup / Cancel',p:'pickup',i:'ti-package'},
+  {l:'Orders',p:'orders',i:'ti-shopping-cart'},
+  {l:'NDR / Returns',p:'ndr',i:'ti-alert-triangle'},
+  {l:'RTO Analytics',p:'rto',i:'ti-chart-bar'},
+  {l:'Attendance',p:'attendance',i:'ti-clock'},
+  {l:'Employees',p:'employees',i:'ti-users'},
+  {l:'Leave',p:'leave',i:'ti-calendar-off'},
+  {l:'Payroll',p:'payroll',i:'ti-cash'},
+  {l:'Training',p:'training',i:'ti-school'},
+  {l:'Expenses',p:'expenses',i:'ti-receipt'},
+  {l:'Bank Statements',p:'bank',i:'ti-building-bank'},
+  {l:'Products',p:'products',i:'ti-diamond'},
+  {l:'Categories',p:'categories',i:'ti-tags'},
+  {l:'Shopify Sync',p:'shopify',i:'ti-refresh'},
+  {l:'Influencers',p:'influencers',i:'ti-star'},
+  {l:'Tasks',p:'tasks',i:'ti-checklist'},
+  {l:'Calendar',p:'calendar',i:'ti-calendar'},
+  {l:'Settings',p:'settings',i:'ti-settings'},
+];
+function openSearch(){eid('searchOverlay').classList.add('open');eid('searchInput').value='';renderSearchRes('');eid('searchInput').focus();}
+function closeSearch(){eid('searchOverlay').classList.remove('open');}
+function renderSearchRes(q){const items=q?PAGES.filter(x=>x.l.toLowerCase().includes(q.toLowerCase())):PAGES;eid('searchResults').innerHTML=items.map(x=>`<div class="search-result-item" onclick="navigate('${x.p}');closeSearch()"><i class="ti ${x.i}"></i><span>${x.l}</span></div>`).join('');}
+
+// ═══════════════════════════════════════════
+//  SIDEBAR / DARK
+// ═══════════════════════════════════════════
+function openSidebar(){eid('sidebar').classList.add('open');eid('sidebarOverlay').classList.add('open');}
+function closeSidebar(){eid('sidebar').classList.remove('open');eid('sidebarOverlay').classList.remove('open');}
+function toggleDark(){S.dark=!S.dark;document.documentElement.setAttribute('data-dark',S.dark?'1':'0');eid('darkBtn').innerHTML=`<i class="ti ti-${S.dark?'sun':'moon'}"></i>`;localStorage.setItem('ornaza_dark',S.dark?'1':'0');}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+async function init(){
+  await initIDB();
+  // Dark mode
+  if(localStorage.getItem('ornaza_dark')==='1'){S.dark=true;document.documentElement.setAttribute('data-dark','1');eid('darkBtn').innerHTML='<i class="ti ti-sun"></i>';}
+  // Saved API URL
+  const su=localStorage.getItem('ornaza_api_url');if(su)CONFIG.API_URL=su;
+  // Restore session
+  try{const s=JSON.parse(localStorage.getItem('ornaza_session')||'null');if(s&&s.token){S.token=s.token;S.user=s.name;S.role=s.role;showApp();}}catch{}
+  // Offline
+  window.addEventListener('online',()=>{eid('offlineBanner').classList.remove('show');flushQueue();});
+  window.addEventListener('offline',()=>eid('offlineBanner').classList.add('show'));
+  if(!navigator.onLine)eid('offlineBanner').classList.add('show');
+  // Events
+  eid('loginBtn').addEventListener('click',login);
+  eid('loginPass').addEventListener('keydown',e=>e.key==='Enter'&&login());
+  eid('hamburgerBtn').addEventListener('click',openSidebar);
+  eid('sidebarOverlay').addEventListener('click',closeSidebar);
+  eid('darkBtn').addEventListener('click',toggleDark);
+  eid('syncBtn').addEventListener('click',()=>{flushQueue();toast('Syncing&#8230;','info');});
+  eid('searchBtn').addEventListener('click',openSearch);
+  eid('searchInput').addEventListener('input',e=>renderSearchRes(e.target.value));
+  eid('searchOverlay').addEventListener('click',e=>{if(e.target===eid('searchOverlay'))closeSearch();});
+  eid('genericModalClose').addEventListener('click',closeModal);
+  eid('userAvatar').addEventListener('click',()=>navigate('settings'));
+  document.querySelectorAll('.nav-item[data-page]').forEach(n=>n.addEventListener('click',()=>navigate(n.dataset.page)));
+  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openSearch();}if(e.key==='Escape')closeSearch();});
+  // Service Worker
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
