@@ -617,41 +617,48 @@ async function renderPage(page) {
 // ═══════════════════════════════════════════
 async function renderDashboard(el) {
   const d = await api('getDashboard');
+  const recentOrders = d.recentOrders || [];
+  const todayOrders = d.todayOrders || 0;
+  const totalRevenue = d.totalRevenue || 0;
+  const pendingNDR = d.pendingNDR || 0;
+  const rtoPct = d.rtoPct || 0;
+  const attendanceToday = d.attendanceToday || 0;
+  const totalEmployees = d.totalEmployees || 1;
   el.innerHTML = `
   <div class="grid g4 mb-2">
     <div class="card stat-card">
       <div class="stat-icon" style="background:rgba(212,132,154,.15);color:var(--rose)"><i class="ti ti-shopping-cart"></i></div>
-      <div><div class="stat-val">${d.todayOrders}</div><div class="stat-label">Today's Orders</div></div>
+      <div><div class="stat-val">${todayOrders}</div><div class="stat-label">Today's Orders</div></div>
     </div>
     <div class="card stat-card">
       <div class="stat-icon" style="background:rgba(39,174,96,.12);color:#27ae60"><i class="ti ti-coin-rupee"></i></div>
-      <div><div class="stat-val">&#8377;${(d.totalRevenue/1000).toFixed(1)}K</div><div class="stat-label">Revenue (Month)</div></div>
+      <div><div class="stat-val">&#8377;${totalRevenue>0?(totalRevenue/1000).toFixed(1)+'K':'0'}</div><div class="stat-label">Revenue (Month)</div></div>
     </div>
     <div class="card stat-card">
       <div class="stat-icon" style="background:rgba(231,76,60,.1);color:#e74c3c"><i class="ti ti-alert-triangle"></i></div>
-      <div><div class="stat-val">${d.pendingNDR}</div><div class="stat-label">Pending NDR</div></div>
+      <div><div class="stat-val">${pendingNDR}</div><div class="stat-label">Pending NDR</div></div>
     </div>
     <div class="card stat-card">
       <div class="stat-icon" style="background:rgba(243,156,18,.1);color:#f39c12"><i class="ti ti-package-off"></i></div>
-      <div><div class="stat-val">${d.rtoPct}%</div><div class="stat-label">RTO Rate</div></div>
+      <div><div class="stat-val">${rtoPct}%</div><div class="stat-label">RTO Rate</div></div>
     </div>
   </div>
   <div class="grid g2">
     <div class="card">
       <div class="card-header"><div class="card-title">Recent Orders</div><button class="btn btn-sm btn-secondary" onclick="navigate('orders')">View All</button></div>
       <div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
-      <tbody>${d.recentOrders.map(o=>`<tr><td>${o.id}</td><td>${o.product}</td><td>&#8377;${o.amount}</td><td>${badge(o.status)}</td></tr>`).join('')}</tbody></table></div>
+      <tbody>${recentOrders.length?recentOrders.map(o=>`<tr><td>${o.id||'-'}</td><td>${o.product||'-'}</td><td>&#8377;${o.amount||0}</td><td>${badge(o.status||'Pending')}</td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">No orders yet</td></tr>'}</tbody></table></div>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title">Today at a Glance</div></div>
       <div style="display:grid;gap:16px">
         <div>
-          <div class="flex justify-between text-sm mb-1"><span>Staff Present</span><span class="font-bold">${d.attendanceToday}/${d.totalEmployees}</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(d.attendanceToday/d.totalEmployees*100)}%"></div></div>
+          <div class="flex justify-between text-sm mb-1"><span>Staff Present</span><span class="font-bold">${attendanceToday}/${totalEmployees}</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${Math.round(attendanceToday/totalEmployees*100)}%"></div></div>
         </div>
         <div>
-          <div class="flex justify-between text-sm mb-1"><span>RTO Rate</span><span class="font-bold">${d.rtoPct}%</span></div>
-          <div class="progress-bar"><div class="progress-fill" style="width:${d.rtoPct}%;background:linear-gradient(90deg,#f39c12,#e74c3c)"></div></div>
+          <div class="flex justify-between text-sm mb-1"><span>RTO Rate</span><span class="font-bold">${rtoPct}%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${rtoPct}%;background:linear-gradient(90deg,#f39c12,#e74c3c)"></div></div>
         </div>
         <div class="flex gap-2 mt-1">
           <button class="btn btn-primary btn-sm" onclick="navigate('attendance')"><i class="ti ti-clock"></i> Attendance</button>
