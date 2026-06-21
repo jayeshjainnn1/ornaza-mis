@@ -383,7 +383,6 @@ async function api(action, body = {}) {
   if (!CONFIG.API_URL) return mockApi(action, body);
   const res = await fetch(CONFIG.API_URL, {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({action, token: S.token, ...body})
   });
   const json = await res.json();
